@@ -1,4 +1,3 @@
-import { FC } from "react";
 import * as React from "react";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -16,6 +15,7 @@ import { Link as RouterLink } from "react-router-dom";
 import { TypeSetState } from "../../types/types";
 import { IUserData } from "./types";
 import { IAuth } from "./Auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 function Copyright(props: any) {
   return (
@@ -38,19 +38,23 @@ const theme = createTheme();
 
 export interface ISignIn extends IAuth {
   setUserData: TypeSetState<IUserData>;
+  userData: IUserData;
 }
+
 const SignIn: React.FunctionComponent<ISignIn> = ({
   setUserData,
   setIsSignIn,
   isSignIn,
+  userData,
 }) => {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+    const auth = getAuth();
+    try {
+      await signInWithEmailAndPassword(auth, userData.email, userData.password);
+    } catch (error: any) {
+      console.log(error.message);
+    }
   };
 
   return (
@@ -103,6 +107,9 @@ const SignIn: React.FunctionComponent<ISignIn> = ({
                 name="email"
                 autoComplete="email"
                 autoFocus
+                onChange={(e) =>
+                  setUserData({ ...userData, email: e.target.value })
+                }
               />
               <TextField
                 margin="normal"
@@ -113,6 +120,9 @@ const SignIn: React.FunctionComponent<ISignIn> = ({
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                onChange={(e) =>
+                  setUserData({ ...userData, password: e.target.value })
+                }
               />
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}

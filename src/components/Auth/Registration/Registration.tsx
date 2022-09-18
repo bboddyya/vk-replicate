@@ -12,9 +12,9 @@ import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Icon56LogoVk } from "@vkontakte/icons";
 import { Link as RouterLink } from "react-router-dom";
-import { TypeSetState } from "../../../types/types";
 import { FC } from "react";
-import { IAuth } from "../Auth";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { ISignIn } from "../SignIn";
 
 function Copyright(props: any) {
   return (
@@ -35,14 +35,24 @@ function Copyright(props: any) {
 
 const theme = createTheme();
 
-const Registration: FC<IAuth> = ({ isSignIn, setIsSignIn }) => {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+const Registration: FC<ISignIn> = ({
+  isSignIn,
+  setIsSignIn,
+  userData,
+  setUserData,
+}) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+    const auth = getAuth();
+    try {
+      await createUserWithEmailAndPassword(
+        auth,
+        userData.email,
+        userData.password
+      );
+    } catch (error: any) {
+      console.log(error.message);
+    }
   };
 
   return (
@@ -108,7 +118,10 @@ const Registration: FC<IAuth> = ({ isSignIn, setIsSignIn }) => {
                 required
                 fullWidth
                 name="email"
-                label="Почта или телефон"
+                label="Почта"
+                onChange={(e) =>
+                  setUserData({ ...userData, email: e.target.value })
+                }
               />
               <TextField
                 margin="normal"
@@ -119,6 +132,9 @@ const Registration: FC<IAuth> = ({ isSignIn, setIsSignIn }) => {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                onChange={(e) =>
+                  setUserData({ ...userData, password: e.target.value })
+                }
               />
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
@@ -150,4 +166,4 @@ const Registration: FC<IAuth> = ({ isSignIn, setIsSignIn }) => {
   );
 };
 
-export default React.memo(Registration);
+export default Registration;

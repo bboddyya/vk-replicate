@@ -14,6 +14,8 @@ const Auth: React.FunctionComponent<IAuth> = ({ isSignIn, setIsSignIn }) => {
     email: "",
     password: "",
   } as IUserData);
+
+  console.log(userData);
   return (
     <>
       {isSignIn ? (
@@ -21,9 +23,15 @@ const Auth: React.FunctionComponent<IAuth> = ({ isSignIn, setIsSignIn }) => {
           setUserData={setUserData}
           setIsSignIn={setIsSignIn}
           isSignIn={isSignIn}
+          userData={userData}
         />
       ) : (
-        <Registration setIsSignIn={setIsSignIn} isSignIn={isSignIn} />
+        <Registration
+          setUserData={setUserData}
+          setIsSignIn={setIsSignIn}
+          isSignIn={isSignIn}
+          userData={userData}
+        />
       )}
     </>
   );
